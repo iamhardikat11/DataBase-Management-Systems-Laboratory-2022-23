@@ -333,7 +333,7 @@ Questions
     3. Names of all the nurses who have ever been on call for room 123
 */
     SELECT Name FROM 20CS30023.Nurse WHERE EmployeeID IN (
-     SELECT Nurse FROM 20CS30023.On_Call WHERE BlockFloor IN (
+     SELECT DISTINCT Nurse FROM 20CS30023.On_Call WHERE BlockFloor IN (
         SELECT BlockFloor FROM 20CS30023.Room WHERE Number=123
      )
      AND BlockCode IN(
@@ -344,7 +344,7 @@ Questions
     4. Names and addresses of all patients who were prescribed the medication named “remdesivir”
 */   
     SELECT Name, Address FROM 20CS30023.Patient WHERE SSN IN (
-        SELECT Patient FROM 20CS30023.Prescribes WHERE Medication IN (
+        SELECT DISTINCT Patient FROM 20CS30023.Prescribes WHERE Medication IN (
             SELECT Code FROM 20CS30023.Medication WHERE Name='Remdesivir'
         )
     );
