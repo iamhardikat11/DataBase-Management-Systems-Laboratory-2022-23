@@ -88,8 +88,10 @@ CREATE TABLE IF NOT EXISTS db_name.Prescribes(
 CREATE TABLE IF NOT EXISTS db_name.Block(
     Floor INTEGER NOT NULL,
     Code INTEGER NOT NULL,
-    PRIMARY KEY (Floor, Code)
+    PRIMARY KEY (Code, Floor)
 );
+
+ALTER TABLE db_name.Block ADD INDEX (Floor, Code);
 
 CREATE TABLE IF NOT EXISTS db_name.Room(
     Number INTEGER PRIMARY KEY NOT NULL,
