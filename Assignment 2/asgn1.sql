@@ -1,16 +1,16 @@
 CREATE DATABASE IF NOT EXISTS db_name;
 CREATE TABLE IF NOT EXISTS db_name.Physician (
     EmployeeID INTEGER PRIMARY KEY NOT NULL,
-    Name TEXT NOT NULL,
+    `Name` TEXT NOT NULL,
     Position TEXT NOT NULL,
     SSN INTEGER NOT NULL
 );
 CREATE TABLE IF NOT EXISTS db_name.Department(
     DepartmentID INTEGER PRIMARY KEY NOT NULL,
-    Name TEXT NOT NULL,
+    `Name` TEXT NOT NULL,
     Head INTEGER NOT NULL
 );
-CREATE TABLE IF NOT EXISTS db_name.Affiliated_With (
+CREATE TABLE IF NOT EXISTS db_name.Affiliated_With(
   PrimaryAffiliation BOOLEAN NOT NULL DEFAULT false,
   Physician INTEGER NOT NULL,
   Department INTEGER NOT NULL,
@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS db_name.Affiliated_With (
 );
 CREATE TABLE IF NOT EXISTS db_name.Procedure(
     Code INTEGER PRIMARY KEY NOT NULL,
-    Name TEXT NOT NULL,
+    `Name` TEXT NOT NULL,
     Cost INTEGER NOT NULL
 );
 CREATE TABLE IF NOT EXISTS db_name.Trained_In(
@@ -35,8 +35,8 @@ CREATE TABLE IF NOT EXISTS db_name.Trained_In(
 
 CREATE TABLE IF NOT EXISTS db_name.Patient(
     SSN INTEGER PRIMARY KEY NOT NULL,
-    Name TEXT NOT NULL,
-    Address TEXT NOT NULL,
+    `Name` TEXT NOT NULL,
+    `Address` TEXT NOT NULL,
     Phone TEXT NOT NULL,
     InsuranceID INTEGER NOT NULL,
     PCP INTEGER NOT NULL,
@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS db_name.Patient(
 
 CREATE TABLE IF NOT EXISTS db_name.Nurse(
     EmployeeID INTEGER PRIMARY KEY NOT NULL,
-    Name TEXT NOT NULL,
+    `Name` TEXT NOT NULL,
     Position TEXT NOT NULL,
     Registered BOOLEAN NOT NULL DEFAULT FALSE,
     SSN INTEGER NOT NULL
@@ -56,8 +56,8 @@ CREATE TABLE IF NOT EXISTS db_name.Appointment(
     Patient INTEGER NOT NULL,
     PrepNurse INTEGER,
     Physician INTEGER NOT NULL,
-    Start DATETIME NOT NULL,
-    End DATETIME NOT NULL,
+    `Start` DATETIME NOT NULL,
+    `End` DATETIME NOT NULL,
     ExaminationRoom TEXT NOT NULL,
     FOREIGN KEY (Patient) REFERENCES db_name.Patient(SSN),
     FOREIGN KEY (PrepNurse) REFERENCES db_name.Nurse(EmployeeID),
@@ -66,16 +66,16 @@ CREATE TABLE IF NOT EXISTS db_name.Appointment(
 
 CREATE TABLE IF NOT EXISTS db_name.Medication(
     Code INTEGER PRIMARY KEY NOT NULL,
-    Name TEXT NOT NULL,
+    `Name` TEXT NOT NULL,
     Brand TEXT NOT NULL,
-    Description TEXT NOT NULL
+    `Description` TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS db_name.Prescribes(
     Physician INTEGER NOT NULL,
     Patient INTEGER NOT NULL,
     Medication INTEGER NOT NULL,
-    Date DATETIME NOT NULL,
+    `Date` DATETIME NOT NULL,
     Appointment INTEGER, 
     Dose TEXT NOT NULL,
     PRIMARY KEY (Physician, Patient, Medication, Date),
@@ -94,8 +94,8 @@ CREATE TABLE IF NOT EXISTS db_name.Block(
 ALTER TABLE db_name.Block ADD INDEX (Floor, Code);
 
 CREATE TABLE IF NOT EXISTS db_name.Room(
-    Number INTEGER PRIMARY KEY NOT NULL,
-    Type TEXT NOT NULL,
+    `Number` INTEGER PRIMARY KEY NOT NULL,
+    `Type` TEXT NOT NULL,
     BlockFloor INTEGER NOT NULL,
     BlockCode INTEGER NOT NULL,
     Unavailable BOOLEAN NOT NULL DEFAULT FALSE,
@@ -103,14 +103,48 @@ CREATE TABLE IF NOT EXISTS db_name.Room(
     FOREIGN KEY (BlockCode) REFERENCES db_name.Block(Code)
 );
 
+CREATE TABLE IF NOT EXISTS db_name.On_Call(
+    Nurse INTEGER NOT NULL,
+    BlockFloor INTEGER NOT NULL,
+    BlockCode INTEGER NOT NULL,
+    `Start` DATETIME NOT NULL,
+    `End` DATETIME NOT NULL,
+    PRIMARY KEY (Nurse, BlockCode, BlockFloor, Start, End),
+    FOREIGN KEY (BlockFloor) REFERENCES db_name.Block(Floor),
+    FOREIGN KEY (BlockCode) REFERENCES db_name.Block(Code),
+    FOREIGN KEY (Nurse) REFERENCES db_name.Nurse(EmployeeID)
 
-/*
-CREATE TABLE On_Call
-CREATE TABLE Stay
-CREATE TABLE Undergoes
-DELETE FROM db_name.Medication;
-*/
+);
 
+CREATE TABLE IF NOT EXISTS db_name.Stay(
+    StayID INTEGER PRIMARY KEY NOT NULL,
+    Patient INTEGER NOT NULL,
+    Room INTEGER NOT NULL,
+    `Start` DATETIME NOT NULL,
+    `End` DATETIME NOT NULL,
+    FOREIGN KEY (Patient) REFERENCES db_name.Patient(SSN),
+    FOREIGN KEY (Room) REFERENCES db_name.Room(Number)
+);
+
+CREATE TABLE IF NOT EXISTS db_name.Undergoes(
+    Patient INTEGER NOT NULL,
+    `Procedure` INTEGER NOT NULL,
+    Stay INTEGER NOT NULL,
+    `Date` DATETIME NOT NULL,
+    Physician INTEGER NOT NULL,
+    AssistingNurse INTEGER,
+    PRIMARY KEY (Patient, `Procedure`, Stay, `Date`),
+    FOREIGN KEY (Patient) REFERENCES db_name.Patient(SSN),
+    FOREIGN KEY (`Procedure`) REFERENCES db_name.Procedure(Code),
+    FOREIGN KEY (Stay) REFERENCES db_name.Stay(StayID),
+    FOREIGN KEY (Physician) REFERENCES db_name.Physician(EmployeeID),
+    FOREIGN KEY (AssistingNurse) REFERENCES db_name.Nurse(EmployeeID)
+);
+
+
+DELETE FROM db_name.Undergoes;
+DELETE FROM db_name.Stay;
+DELETE FROM db_name.On_Call;
 DELETE FROM db_name.Room;
 DELETE FROM db_name.Block;
 DELETE FROM db_name.Prescribes;
@@ -200,7 +234,6 @@ INSERT INTO db_name.Prescribes VALUES(1,100000001,1,'2008-04-24 10:47',13216584,
 INSERT INTO db_name.Prescribes VALUES(8,100000004,2,'2008-04-27 10:53',86213939,'10');
 INSERT INTO db_name.Prescribes VALUES(9,100000004,3,'2008-04-30 16:53',NULL,'5');
 
-
 INSERT INTO db_name.Block VALUES(1,1);
 INSERT INTO db_name.Block VALUES(1,2);
 INSERT INTO db_name.Block VALUES(1,3);
@@ -213,3 +246,58 @@ INSERT INTO db_name.Block VALUES(3,3);
 INSERT INTO db_name.Block VALUES(4,1);
 INSERT INTO db_name.Block VALUES(4,2);
 INSERT INTO db_name.Block VALUES(4,3);
+
+INSERT INTO db_name.Room VALUES(101,'Single',1,1,0);
+INSERT INTO db_name.Room VALUES(102,'Single',1,1,0);
+INSERT INTO db_name.Room VALUES(103,'Single',1,1,0);
+INSERT INTO db_name.Room VALUES(111,'Single',1,2,0);
+INSERT INTO db_name.Room VALUES(112,'Single',1,2,1);
+INSERT INTO db_name.Room VALUES(113,'Single',1,2,0);
+INSERT INTO db_name.Room VALUES(121,'Single',1,3,0);
+INSERT INTO db_name.Room VALUES(122,'Single',1,3,0);
+INSERT INTO db_name.Room VALUES(123,'Single',1,3,0);
+INSERT INTO db_name.Room VALUES(201,'Single',2,1,1);
+INSERT INTO db_name.Room VALUES(202,'Single',2,1,0);
+INSERT INTO db_name.Room VALUES(203,'Single',2,1,0);
+INSERT INTO db_name.Room VALUES(211,'Single',2,2,0);
+INSERT INTO db_name.Room VALUES(212,'Single',2,2,0);
+INSERT INTO db_name.Room VALUES(213,'Single',2,2,1);
+INSERT INTO db_name.Room VALUES(221,'Single',2,3,0);
+INSERT INTO db_name.Room VALUES(222,'Single',2,3,0);
+INSERT INTO db_name.Room VALUES(223,'Single',2,3,0);
+INSERT INTO db_name.Room VALUES(301,'Single',3,1,0);
+INSERT INTO db_name.Room VALUES(302,'Single',3,1,1);
+INSERT INTO db_name.Room VALUES(303,'Single',3,1,0);
+INSERT INTO db_name.Room VALUES(311,'Single',3,2,0);
+INSERT INTO db_name.Room VALUES(312,'Single',3,2,0);
+INSERT INTO db_name.Room VALUES(313,'Single',3,2,0);
+INSERT INTO db_name.Room VALUES(321,'Single',3,3,1);
+INSERT INTO db_name.Room VALUES(322,'Single',3,3,0);
+INSERT INTO db_name.Room VALUES(323,'Single',3,3,0);
+INSERT INTO db_name.Room VALUES(401,'Single',4,1,0);
+INSERT INTO db_name.Room VALUES(402,'Single',4,1,1);
+INSERT INTO db_name.Room VALUES(403,'Single',4,1,0);
+INSERT INTO db_name.Room VALUES(411,'Single',4,2,0);
+INSERT INTO db_name.Room VALUES(412,'Single',4,2,0);
+INSERT INTO db_name.Room VALUES(413,'Single',4,2,0);
+INSERT INTO db_name.Room VALUES(421,'Single',4,3,1);
+INSERT INTO db_name.Room VALUES(422,'Single',4,3,0);
+INSERT INTO db_name.Room VALUES(423,'Single',4,3,0);
+
+INSERT INTO db_name.On_Call VALUES(101,1,1,'2008-11-04 11:00','2008-11-04 19:00');
+INSERT INTO db_name.On_Call VALUES(101,1,2,'2008-11-04 11:00','2008-11-04 19:00');
+INSERT INTO db_name.On_Call VALUES(102,1,3,'2008-11-04 11:00','2008-11-04 19:00');
+INSERT INTO db_name.On_Call VALUES(103,1,1,'2008-11-04 19:00','2008-11-05 03:00');
+INSERT INTO db_name.On_Call VALUES(103,1,2,'2008-11-04 19:00','2008-11-05 03:00');
+INSERT INTO db_name.On_Call VALUES(103,1,3,'2008-11-04 19:00','2008-11-05 03:00');
+
+INSERT INTO db_name.Stay VALUES(3215,100000001,111,'2008-05-01','2008-05-04');
+INSERT INTO db_name.Stay VALUES(3216,100000003,123,'2008-05-03','2008-05-14');
+INSERT INTO db_name.Stay VALUES(3217,100000004,112,'2008-05-02','2008-05-03');
+
+INSERT INTO db_name.Undergoes VALUES(100000001,6,3215,'2008-05-02',3,101);
+INSERT INTO db_name.Undergoes VALUES(100000001,2,3215,'2008-05-03',7,101);
+INSERT INTO db_name.Undergoes VALUES(100000004,1,3217,'2008-05-07',3,102);
+INSERT INTO db_name.Undergoes VALUES(100000004,5,3217,'2008-05-09',6,NULL);
+INSERT INTO db_name.Undergoes VALUES(100000001,3,3217,'2008-05-10',7,101);
+INSERT INTO db_name.Undergoes VALUES(100000004,4,3217,'2008-05-13',3,103);
