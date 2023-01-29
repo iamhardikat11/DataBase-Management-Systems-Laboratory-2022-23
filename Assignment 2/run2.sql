@@ -1,1 +1,0 @@
-SELECT * FROM `db_name`.`Physician` LIMIT 1000;
