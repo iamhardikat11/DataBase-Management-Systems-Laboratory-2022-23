@@ -10,7 +10,7 @@ conn = psycopg2.connect("dbname=postgres user=hardiksoni")
 # Open a cursor to perform database operations
 
 def printDB(data, columns):
-    if(len(data)==0):
+    if(len(data) == 0 or data is None):
         print("No data Found \n")
         return
     col_widths = [max(len(str(row[i])) for row in data) for i in range(len(columns))]
@@ -89,10 +89,10 @@ cur.execute("INSERT INTO Procedure VALUES(4, 'Complete Wallectomy', 5500.0);");
 cur.execute("INSERT INTO Procedure VALUES(5, 'bypass surgery', 5899.0);");
 cur.execute("INSERT INTO Procedure VALUES(6, 'Reversible PancreaomyPlasty', 1322.40);");
 #Inserting into Patient Table
-cur.execute("INSERT INTO Patient VALUES(100000001,'Jonhny Smithsonian','42 Foobar Lane','+91 983-555-0256',68476213,1);");
-cur.execute("INSERT INTO Patient VALUES(100000002,'Grace Ritchie','37 Snafu Drive','+91 785-551-0512',36546321,6);");
-cur.execute("INSERT INTO Patient VALUES(100000003,'Random J. Patient','101 Omgbbq Street','+91 985-552-1204',65465421,5);");
-cur.execute("INSERT INTO Patient VALUES(100000004,'Dennis Doe','1100 Foobaz Avenue','+91 895-552-2048',68421879,3);");
+cur.execute("INSERT INTO Patient (SSN, Name, Address, Phone, InsuranceID, PCP) VALUES(100000001,'Jonhny Smithsonian','42 Foobar Lane','+91 983-555-0256',68476213,1);");
+cur.execute("INSERT INTO Patient (SSN, Name, Address, Phone, InsuranceID, PCP) VALUES(100000002,'Grace Ritchie','37 Snafu Drive','+91 785-551-0512',36546321,6);");
+cur.execute("INSERT INTO Patient (SSN, Name, Address, Phone, InsuranceID, PCP) VALUES(100000003,'Random J. Patient','101 Omgbbq Street','+91 985-552-1204',65465421,5);");
+cur.execute("INSERT INTO Patient (SSN, Name, Address, Phone, InsuranceID, PCP) VALUES(100000004,'Dennis Doe','1100 Foobaz Avenue','+91 895-552-2048',68421879,3);");
 #Inserting into Trained In Table
 cur.execute("INSERT INTO Trained_In (Treatment, Physician, CertificationDate, CertificationExpires) VALUES(1,1,'2008-01-01 12:00:00','2008-12-31 12:00:00');");
 cur.execute("INSERT INTO Trained_In (Treatment, Physician, CertificationDate, CertificationExpires) VALUES(2,3,'2008-01-01 12:00:00','2008-12-31 12:00:00');");
@@ -153,7 +153,7 @@ cur.execute("INSERT INTO Block VALUES(4,3);");
 cur.execute("INSERT INTO Room VALUES(101,'Single',1,1,false);");
 cur.execute("INSERT INTO Room VALUES(102,'Single',1,1,false);");
 cur.execute("INSERT INTO Room VALUES(103,'icu',1,1,false);");
-cur.execute("INSERT INTO Room VALUES(111,'Single',1,2,false);");
+cur.execute("INSERT INTO Room VALUES(111,'icu',1,2,false);");
 cur.execute("INSERT INTO Room VALUES(112,'Single',1,2,true);");
 cur.execute("INSERT INTO Room VALUES(113,'Single',1,2,false);");
 cur.execute("INSERT INTO Room VALUES(121,'Single',1,3,false);");
@@ -194,7 +194,7 @@ cur.execute("INSERT INTO On_Call VALUES(103,1,1,'2008-11-04 19:00','2008-11-05 0
 cur.execute("INSERT INTO On_Call VALUES(103,1,2,'2008-11-04 19:00','2008-11-05 03:00');");
 cur.execute("INSERT INTO On_Call VALUES(103,1,3,'2008-11-04 19:00','2008-11-05 03:00');");
 #Inserting into Stay Table
-cur.execute("INSERT INTO Stay VALUES(3215,100000001,111,'2008-05-01','2008-05-04');");
+cur.execute("INSERT INTO Stay VALUES(3215,100000001,111,'2008-05-01','2008-07-04');");
 cur.execute("INSERT INTO Stay VALUES(3216,100000003,123,'2008-05-03','2008-05-14');");
 cur.execute("INSERT INTO Stay VALUES(3217,100000004,112,'2008-05-02','2008-05-03');");
 #Inserting into Undergoes Table
@@ -243,14 +243,15 @@ printDB(ans, ['Name_Patient', 'Address_Patient'])
     5. Name and insurance id of all patients who stayed in the “icu” room type for more than 15 days
 """
 print("\n[*] Answer to Query 5:-")
-# cur.execute("SELECT  P.Name AS Patient_Name , P.InsuranceID AS Patient_InsuranceID, DATEDIFF(day, S.StartDate, S.EndDate) AS Stay_Duration FROM Patient P JOIN Stay S ON P.SSN = S.Patient JOIN Room R ON S.Room = R.Number WHERE Stay_Duration > 360 AND R.Type='icu';")
-# printDB(ans, ['Patient_Name', 'Patient_Insurance_ID'])
+cur.execute("SELECT P.Name AS Patient_Name, P.InsuranceID AS Patient_InsuranceID FROM Patient P JOIN Stay S ON P.SSN = S.Patient JOIN Room R ON S.Room = R.Number WHERE S.EndDate-S.StartDate > 15 AND R.Type='icu';")
+ans = cur.fetchall()
+printDB(ans, ['Patient_Name', 'Patient_Insurance_ID'])
 
 """
     6. Names of all nurses who assisted in the procedure name “bypass surgery”
 """
 print("\n[*] Answer to Query 6:-")
-cur.execute("SELECT N.Name AS Nurse_Name FROM Undergoes U JOIN Procedure P ON U.Procedure1 = P.Code JOIN Nurse N ON U.AssistingNurse = N.EmployeeID WHERE P.Name = 'ByPass Surgery';")
+cur.execute("SELECT N.Name AS Nurse_Name FROM Undergoes U JOIN Procedure P ON U.Procedure1 = P.Code JOIN Nurse N ON U.AssistingNurse = N.EmployeeID WHERE P.Name = 'bypass surgery';")
 ans = cur.fetchall()
 printDB(ans, ['Nurse_Name'])
 
