@@ -8,6 +8,18 @@
 import psycopg2
 conn = psycopg2.connect("dbname=postgres user=hardiksoni")
 # Open a cursor to perform database operations
+
+def printDB(data, columns):
+    col_widths = [max(len(str(row[i])) for row in data) for i in range(len(columns))]
+    header = ' | '.join(column.ljust(width) for column, width in zip(columns, col_widths))
+    print('-' * len(header))
+    print(header)
+    print('-' * len(header))
+    for row in data:
+        print(' | '.join(str(cell).ljust(width) for cell, width in zip(row, col_widths)))
+    print('-' * len(header))
+    print('\n')
+
 cur = conn.cursor()
 # Creation of Table Done
 cur.execute("CREATE TABLE IF NOT EXISTS Physician ( EmployeeID INTEGER PRIMARY KEY NOT NULL, Name TEXT NOT NULL, Position TEXT NOT NULL, SSN INTEGER NOT NULL);")
@@ -189,6 +201,86 @@ cur.execute("INSERT INTO Undergoes VALUES(100000004,1,3217,'2008-05-07',3,102);"
 cur.execute("INSERT INTO Undergoes VALUES(100000004,5,3217,'2008-05-09',6,102);");
 cur.execute("INSERT INTO Undergoes VALUES(100000001,3,3217,'2008-05-10',7,101);");
 cur.execute("INSERT INTO Undergoes VALUES(100000004,4,3217,'2008-05-13',3,103);");
+
+"""
+Questions 
+    Queries: Obtain the following -
+    1. Names of all physicians who are trained in procedure name “bypass surgery”   
+"""
+print("\n[*] Answer to Query 1:-")
+cur.execute("SELECT P.Name AS Physician_Name FROM Physician AS P JOIN Trained_In AS T ON P.EmployeeID = T.Physician JOIN Procedure AS Pr ON T.Treatment = Pr.Code WHERE Pr.name = 'ByPass Surgery' ;")
+ans = cur.fetchall()
+printDB(ans, ['Physician_Name'])
+
+"""
+2. Names of all physicians affiliated with the department name “cardiology” and trained in "bypass surgery"
+"""
+print("\n[*] Answer to Query 2:-")
+cur.execute("SELECT P.Name FROM Physician AS P JOIN Affiliated_With AS AW ON P.EmployeeID = AW.Physician JOIN Department AS D ON AW.Department = D.DepartmentID JOIN Trained_In AS T ON P.EmployeeID = T.Physician JOIN Procedure AS Pr ON T.Treatment = Pr.Code WHERE D.Name = 'Cardiology' AND Pr.Name = 'ByPass Surgery';")
+ans =  cur.fetchall()
+printDB(ans, ['Physician_Name'])
+
+"""
+    3. Names of all the nurses who have ever been on call for room 123
+"""
+print("\n[*] Answer to Query 3:-")
+cur.execute("SELECT Name FROM Nurse WHERE EmployeeID IN ( SELECT Nurse FROM On_Call WHERE BlockFloor IN ( SELECT BlockFloor FROM Room WHERE Number=123 ) AND BlockCode IN( SELECT BlockCode FROM Room WHERE Number=123 ));")
+ans = cur.fetchall()
+printDB(ans, ['Nurse_Name'])
+
+"""
+    4. Names and addresses of all patients who were prescribed the medication named “remdesivir”
+"""
+print("\n[*] Answer to Query 4:-")
+cur.execute("SELECT Name, Address FROM Patient WHERE SSN IN ( SELECT Patient FROM Prescribes WHERE Medication IN ( SELECT Code FROM Medication WHERE Name='Remdesivir' ));")
+ans = cur.fetchall()
+printDB(ans, ['Name_Patient', 'Address_Patient'])
+
+"""
+    5. Name and insurance id of all patients who stayed in the “icu” room type for more than 15 days
+"""
+print("\n[*] Answer to Query 5:-")
+cur.execute("SELECT P.Name AS Patient_Name , P.InsuranceID AS Patient_InsuranceID DATEDIFF(hour, S.Start, S.End) AS Diff FROM Patient P JOIN Stay S ON P.SSN = S.Patient JOIN Room R ON S.Room = R.Number WHERE Diff > 360; ");
+ans = cur.fetchall()
+printDB(ans, ['Patient_Name', 'Patient_Insurance_ID', 'Diff'])
+
+"""
+    6. Names of all nurses who assisted in the procedure name “bypass surgery”
+"""
+
+"""
+    7. Name and position of all nurses who assisted in the procedure name “bypass surgery” along with the names of and the accompanying physicians
+"""
+
+
+
+"""
+    8. Obtain the names of all physicians who have performed a medical procedure they have never been trained to perform
+"""
+
+
+"""
+    9. Names of all physicians who have performed a medical procedure that they are trained to perform, but such that the procedure was done at a date (Undergoes.Date) after the physician's certification expired (Trained_In.CertificationExpires)
+"""
+
+"""
+    10. Same as the previous query, but include the following information in the results: Physician name, name of procedure, date when the procedure was carried out, name of the patient the procedure was carried out on
+"""
+
+
+"""
+    11. Names of all patients (also include, for each patient, the name of the patient's physician), such that all the following are true:
+            • The patient has been prescribed some medication by his/her physician
+            • The patient has undergone a procedure with a cost larger that 5000
+            • The patient has had at least two appointment where the physician was affiliated with the cardiology department
+            • The patient's physician is not the head of any department
+"""
+
+"""
+    12. Name and brand of the medication which has been prescribed to the highest number of patients
+"""
+
+
 
 conn.commit()
 cur.close()
