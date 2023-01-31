@@ -364,23 +364,22 @@ Questions
           SELECT N.Name AS Nurse_Name
           FROM 20CS30023.Undergoes U
           JOIN 20CS30023.Procedure P
-          ON U.Procedure = Code
+          ON U.Procedure = P.Code
           JOIN 20CS30023.Nurse N
           ON U.AssistingNurse = N.EmployeeID
           WHERE P.Name = 'bypass surgery';
 /*
     7. Name and position of all nurses who assisted in the procedure name “bypass surgery” along with the names of and the accompanying physicians
 */
-    SELECT `Name`,Position FROM 20CS30023.Physician WHERE EmployeeID IN (
-        SELECT Physician FROM 20CS30023.Undergoes WHERE `Procedure` IN (
-            SELECT Code FROM 20CS30023.Procedure WHERE Name='bypass surgery'
-        )
-    );
-    SELECT `Name`,Position FROM 20CS30023.Nurse WHERE EmployeeID IN (
-        SELECT AssistingNurse FROM 20CS30023.Undergoes WHERE `Procedure` IN (
-            SELECT Code FROM 20CS30023.Procedure WHERE Name='bypass surgery'
-        )
-    );
+    SELECT P.Name AS Physician_Name, N.Name AS Nurse_Name, N.Position AS Nurse_Position
+    FROM 20CS30023.Undergoes U 
+    JOIN 20CS30023.Physician P
+    ON U.Physician = P.EmployeeID
+    JOIN 20CS30023.Nurse N
+    ON U.AssistingNurse = N.EmployeeID
+    JOIN 20CS30023.Procedure Pr
+    ON U.Procedure = Pr.Code
+    WHERE Pr.Name = 'bypass surgery';
 /*
     8. Obtain the names of all physicians who have performed a medical procedure they have never been trained to perform
 */

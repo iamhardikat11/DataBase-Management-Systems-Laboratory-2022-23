@@ -10,6 +10,9 @@ conn = psycopg2.connect("dbname=postgres user=hardiksoni")
 # Open a cursor to perform database operations
 
 def printDB(data, columns):
+    if(len(data)==0):
+        print("No data Found \n")
+        return
     col_widths = [max(len(str(row[i])) for row in data) for i in range(len(columns))]
     header = ' | '.join(column.ljust(width) for column, width in zip(columns, col_widths))
     print('-' * len(header))
@@ -27,7 +30,7 @@ cur.execute("CREATE TABLE IF NOT EXISTS Department (DepartmentID INTEGER PRIMARY
 cur.execute("CREATE TABLE IF NOT EXISTS Affiliated_With (PrimaryAffiliation BOOLEAN NOT NULL DEFAULT false, Physician INTEGER NOT NULL, Department INTEGER NOT NULL, PRIMARY KEY (Department, Physician), FOREIGN KEY (Physician) REFERENCES Physician (EmployeeID), FOREIGN KEY (Department) REFERENCES Department (DepartmentID) );")
 cur.execute("CREATE TABLE IF NOT EXISTS Procedure ( Code INTEGER PRIMARY KEY NOT NULL, Name TEXT NOT NULL, Cost INTEGER NOT NULL);")
 cur.execute("CREATE TABLE IF NOT EXISTS Trained_In ( Physician INTEGER NOT NULL, Treatment INTEGER NOT NULL, CertificationDate DATE NOT NULL, CertificationExpires DATE NOT NULL, PRIMARY KEY ( Physician, Treatment), FOREIGN KEY (Physician) REFERENCES Physician(EmployeeID), FOREIGN KEY (Treatment) REFERENCES Procedure (Code) );")
-cur.execute("CREATE TABLE IF NOT EXISTS Patient (SSN INTEGER PRIMARY KEY NOT NULL, Name TEXT NOT NULL, Address TEXT NOT NULL, Phone TEXT NOT NULL, InsauranceID INTEGER NOT NULL, PCP INTEGER NOT NULL, FOREIGN KEY (PCP) REFERENCES Physician(EmployeeID) );")
+cur.execute("CREATE TABLE IF NOT EXISTS Patient (SSN INTEGER PRIMARY KEY NOT NULL, Name TEXT NOT NULL, Address TEXT NOT NULL, Phone TEXT NOT NULL, InsuranceID INTEGER NOT NULL, PCP INTEGER NOT NULL, FOREIGN KEY (PCP) REFERENCES Physician(EmployeeID) );")
 cur.execute("CREATE TABLE IF NOT EXISTS Nurse(EmployeeID INTEGER PRIMARY KEY NOT NULL, Name TEXT NOT NULL, Position TEXT NOT NULL, Registered BOOLEAN NOT NULL DEFAULT FALSE, SSN INTEGER NOT NULL );")
 cur.execute("CREATE TABLE IF NOT EXISTS Appointment (AppointmentID INTEGER PRIMARY KEY NOT NULL, Patient INTEGER NOT NULL, PrepNurse INTEGER, Physician INTEGER NOT NULL, StartDate DATE NOT NULL, EndDate DATE NOT NULL, ExaminationRoom TEXT NOT NULL, FOREIGN KEY (Physician) REFERENCES Physician(EmployeeID), FOREIGN KEY (PrepNurse) REFERENCES Nurse(EmployeeID), FOREIGN KEY (Patient) REFERENCES Patient(SSN));")
 cur.execute("CREATE TABLE IF NOT EXISTS Medication ( Code INTEGER PRIMARY KEY NOT NULL, Name TEXT NOT NULL, Brand TEXT NOT NULL, Description TEXT NOT NULL);")
@@ -83,7 +86,7 @@ cur.execute("INSERT INTO Procedure VALUES(1, 'Reverse Rhinopodoplasty',1500.0);"
 cur.execute("INSERT INTO Procedure VALUES(2, 'Obtuse Pyloric Recombustion',8750.0);");
 cur.execute("INSERT INTO Procedure VALUES(3, 'Folded Demiopthalmectomy',4500.0);");
 cur.execute("INSERT INTO Procedure VALUES(4, 'Complete Wallectomy', 5500.0);");
-cur.execute("INSERT INTO Procedure VALUES(5, 'ByPass Surgery', 5899.0);");
+cur.execute("INSERT INTO Procedure VALUES(5, 'bypass surgery', 5899.0);");
 cur.execute("INSERT INTO Procedure VALUES(6, 'Reversible PancreaomyPlasty', 1322.40);");
 #Inserting into Patient Table
 cur.execute("INSERT INTO Patient VALUES(100000001,'Jonhny Smithsonian','42 Foobar Lane','+91 983-555-0256',68476213,1);");
@@ -208,7 +211,7 @@ Questions
     1. Names of all physicians who are trained in procedure name “bypass surgery”   
 """
 print("\n[*] Answer to Query 1:-")
-cur.execute("SELECT P.Name AS Physician_Name FROM Physician AS P JOIN Trained_In AS T ON P.EmployeeID = T.Physician JOIN Procedure AS Pr ON T.Treatment = Pr.Code WHERE Pr.name = 'ByPass Surgery' ;")
+cur.execute("SELECT P.Name AS Physician_Name FROM Physician AS P JOIN Trained_In AS T ON P.EmployeeID = T.Physician JOIN Procedure AS Pr ON T.Treatment = Pr.Code WHERE Pr.name = 'bypass surgery' ;")
 ans = cur.fetchall()
 printDB(ans, ['Physician_Name'])
 
@@ -216,7 +219,7 @@ printDB(ans, ['Physician_Name'])
 2. Names of all physicians affiliated with the department name “cardiology” and trained in "bypass surgery"
 """
 print("\n[*] Answer to Query 2:-")
-cur.execute("SELECT P.Name FROM Physician AS P JOIN Affiliated_With AS AW ON P.EmployeeID = AW.Physician JOIN Department AS D ON AW.Department = D.DepartmentID JOIN Trained_In AS T ON P.EmployeeID = T.Physician JOIN Procedure AS Pr ON T.Treatment = Pr.Code WHERE D.Name = 'Cardiology' AND Pr.Name = 'ByPass Surgery';")
+cur.execute("SELECT P.Name FROM Physician AS P JOIN Affiliated_With AS AW ON P.EmployeeID = AW.Physician JOIN Department AS D ON AW.Department = D.DepartmentID JOIN Trained_In AS T ON P.EmployeeID = T.Physician JOIN Procedure AS Pr ON T.Treatment = Pr.Code WHERE D.Name = 'Cardiology' AND Pr.Name = 'bypass surgery';")
 ans =  cur.fetchall()
 printDB(ans, ['Physician_Name'])
 
@@ -240,19 +243,25 @@ printDB(ans, ['Name_Patient', 'Address_Patient'])
     5. Name and insurance id of all patients who stayed in the “icu” room type for more than 15 days
 """
 print("\n[*] Answer to Query 5:-")
-cur.execute("SELECT P.Name AS Patient_Name , P.InsuranceID AS Patient_InsuranceID DATEDIFF(hour, S.Start, S.End) AS Diff FROM Patient P JOIN Stay S ON P.SSN = S.Patient JOIN Room R ON S.Room = R.Number WHERE Diff > 360; ");
-ans = cur.fetchall()
-printDB(ans, ['Patient_Name', 'Patient_Insurance_ID', 'Diff'])
+# cur.execute("SELECT  P.Name AS Patient_Name , P.InsuranceID AS Patient_InsuranceID, DATEDIFF(day, S.StartDate, S.EndDate) AS Stay_Duration FROM Patient P JOIN Stay S ON P.SSN = S.Patient JOIN Room R ON S.Room = R.Number WHERE Stay_Duration > 360 AND R.Type='icu';")
+# printDB(ans, ['Patient_Name', 'Patient_Insurance_ID'])
 
 """
     6. Names of all nurses who assisted in the procedure name “bypass surgery”
 """
+print("\n[*] Answer to Query 6:-")
+cur.execute("SELECT N.Name AS Nurse_Name FROM Undergoes U JOIN Procedure P ON U.Procedure1 = P.Code JOIN Nurse N ON U.AssistingNurse = N.EmployeeID WHERE P.Name = 'ByPass Surgery';")
+ans = cur.fetchall()
+printDB(ans, ['Nurse_Name'])
 
 """
     7. Name and position of all nurses who assisted in the procedure name “bypass surgery” along with the names of and the accompanying physicians
 """
 
-
+print("\n[*] Answer to Query 7:-")
+cur.execute("SELECT P.Name AS Physician_Name, N.Name AS Nurse_Name, N.Position AS Nurse_Position FROM Undergoes U JOIN Physician P ON U.Physician = P.EmployeeID JOIN Nurse N ON U.AssistingNurse = N.EmployeeID JOIN Procedure Pr ON U.Procedure1 = Pr.Code WHERE Pr.Name = 'bypass surgery';")
+ans = cur.fetchall()
+printDB(ans, [' Physician_Name', 'Nurse_Name', 'Nurse_Position'])
 
 """
     8. Obtain the names of all physicians who have performed a medical procedure they have never been trained to perform
