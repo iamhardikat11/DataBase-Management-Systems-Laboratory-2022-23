@@ -267,6 +267,11 @@ printDB(ans, [' Physician_Name', 'Nurse_Name', 'Nurse_Position'])
     8. Obtain the names of all physicians who have performed a medical procedure they have never been trained to perform
 """
 
+print("\n[*] Answer to Query 8:-")
+cur.execute("SELECT Physician.Name FROM Physician WHERE Physician.EmployeeID NOT IN (SELECT Trained_In.Physician FROM Trained_In WHERE Trained_In.Treatment IN (SELECT Undergoes.Procedure1 FROM Undergoes WHERE Undergoes.Physician = Physician.EmployeeID));")
+ans = cur.fetchall()
+printDB(ans, [' Physician_Name'])
+
 
 """
     9. Names of all physicians who have performed a medical procedure that they are trained to perform, but such that the procedure was done at a date (Undergoes.Date) after the physician's certification expired (Trained_In.CertificationExpires)

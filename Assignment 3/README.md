@@ -24,3 +24,8 @@ https://learn.microsoft.com/en-us/sql/odbc/reference/introduction-to-odbc?view=s
 https://www.postgresqltutorial.com/postgresql-python/connect/
 
 https://dev.mysql.com/doc/connector-python/en/
+
+
+Tasks List:-
+1. Make the Codes Work for both MySQL and PostgreSQL Databases
+2. Implement the same in C and java

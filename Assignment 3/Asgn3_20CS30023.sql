@@ -383,12 +383,16 @@ Questions
 /*
     8. Obtain the names of all physicians who have performed a medical procedure they have never been trained to perform
 */
-    
-    SELECT 20CS30023.Physician.Name FROM 20CS30023.Physician WHERE 20CS30023.Physician.EmployeeID NOT IN (
-        SELECT 20CS30023.Trained_In.Physician FROM 20CS30023.Trained_In WHERE 20CS30023.Trained_In.Treatment IN (
-            SELECT 20CS30023.Undergoes.`Procedure` FROM 20CS30023.Undergoes WHERE 20CS30023.Undergoes.Physician = 20CS30023.Physician.EmployeeID
-        )
-    );
+
+    SELECT DISTINCT Physician.`Name`
+    FROM 20CS30023.Undergoes
+    LEFT JOIN 20CS30023.Trained_In
+    ON 20CS30023.Undergoes.Physician = 20CS30023.Trained_In.Physician
+    AND 20CS30023.Undergoes.`Procedure` = 20CS30023.Trained_In.Treatment
+    JOIN 20CS30023.Physician
+    ON 20CS30023.Undergoes.Physician = 20CS30023.Physician.EmployeeID
+    WHERE 20CS30023.Trained_In.Treatment IS NULL;
+
 /*
     9. Names of all physicians who have performed a medical procedure that they are trained to perform, but such that the procedure was done at a date (Undergoes.Date) after the physician's certification expired (Trained_In.CertificationExpires)
 */
