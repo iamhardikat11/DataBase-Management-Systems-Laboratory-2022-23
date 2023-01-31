@@ -1,7 +1,8 @@
 /*
     Name:- Hardik Pravin Soni
     Roll No:- 20CS30023
-    Subject:- Database Management System Labortary 2023 ()
+    Subject:- Database Management System Labortary 2023 (CS39202)
+    Assignment 2
 */
 CREATE DATABASE IF NOT EXISTS 20CS30023;
 CREATE TABLE IF NOT EXISTS 20CS30023.Physician (
