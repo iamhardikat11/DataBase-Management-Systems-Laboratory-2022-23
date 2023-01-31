@@ -1,7 +1,8 @@
 /*
     Name:- Hardik Pravin Soni
     Roll No:- 20CS30023
-    Subject:- Database Management System Labortary 2023 ()
+    Subject:- Database Management System Labortary 2023 (CS39202)
+    Assignment 2
 */
 CREATE DATABASE IF NOT EXISTS 20CS30023;
 CREATE TABLE IF NOT EXISTS 20CS30023.Physician (
@@ -193,14 +194,14 @@ INSERT INTO 20CS30023.Trained_In (Treatment, Physician, CertificationDate, Certi
 INSERT INTO 20CS30023.Trained_In (Treatment, Physician, CertificationDate, CertificationExpires)  VALUES(2,3,'2022-01-01 12:00:00','2022-12-31 12:00:00');
 INSERT INTO 20CS30023.Trained_In (Treatment, Physician, CertificationDate, CertificationExpires)  VALUES(3,3,'2022-01-01 12:00:00','2022-12-31 12:00:00');
 INSERT INTO 20CS30023.Trained_In (Treatment, Physician, CertificationDate, CertificationExpires)  VALUES(6,3,'2022-01-01 12:00:00','2022-12-31 12:00:00');
-INSERT INTO 20CS30023.Trained_In (Treatment, Physician, CertificationDate, CertificationExpires)  VALUES(4,3,'2022-01-01 12:00:00','2022-12-31 12:00:00');
+INSERT INTO 20CS30023.Trained_In (Treatment, Physician, CertificationDate, CertificationExpires)  VALUES(4,4,'2022-01-01 12:00:00','2022-12-31 12:00:00');
 INSERT INTO 20CS30023.Trained_In (Treatment, Physician, CertificationDate, CertificationExpires)  VALUES(2,2,'2022-01-01 12:00:00','2022-12-31 12:00:00');
-INSERT INTO 20CS30023.Trained_In (Treatment, Physician, CertificationDate, CertificationExpires)  VALUES(5,6,'2007-01-01 12:00:00','2007-12-31 12:00:00');
+INSERT INTO 20CS30023.Trained_In (Treatment, Physician, CertificationDate, CertificationExpires)  VALUES(5,6,'2023-01-01 12:00:00','2023-12-31 12:00:00');
 INSERT INTO 20CS30023.Trained_In (Treatment, Physician, CertificationDate, CertificationExpires)  VALUES(6,4,'2022-01-01 12:00:00','2022-12-31 12:00:00');
 INSERT INTO 20CS30023.Trained_In (Treatment, Physician, CertificationDate, CertificationExpires)  VALUES(5,7,'2022-01-01 12:00:00','2022-12-31 12:00:00');
 INSERT INTO 20CS30023.Trained_In (Treatment, Physician, CertificationDate, CertificationExpires)  VALUES(2,8,'2022-01-01 12:00:00','2022-12-31 12:00:00');
 INSERT INTO 20CS30023.Trained_In (Treatment, Physician, CertificationDate, CertificationExpires)  VALUES(3,9,'2022-01-01 12:00:00','2022-12-31 12:00:00');
-INSERT INTO 20CS30023.Trained_In (Treatment, Physician, CertificationDate, CertificationExpires)  VALUES(1,5,'2022-01-01 12:00:00','2022-12-31 12:00:00');
+INSERT INTO 20CS30023.Trained_In (Treatment, Physician, CertificationDate, CertificationExpires)  VALUES(4,5,'2022-01-01 12:00:00','2022-12-31 12:00:00');
 INSERT INTO 20CS30023.Trained_In (Treatment, Physician, CertificationDate, CertificationExpires)  VALUES(5,4,'2022-01-01 12:00:00','2022-12-31 12:00:00');
 INSERT INTO 20CS30023.Trained_In (Treatment, Physician, CertificationDate, CertificationExpires)  VALUES(6,6,'2022-01-01 12:00:00','2022-12-31 12:00:00');
 INSERT INTO 20CS30023.Trained_In (Treatment, Physician, CertificationDate, CertificationExpires)  VALUES(3,4,'2022-01-01 12:00:00','2022-12-31 12:00:00');
@@ -226,12 +227,11 @@ INSERT INTO 20CS30023.Medication VALUES(4,'Crescavitin','Baz Industries','N/A');
 INSERT INTO 20CS30023.Medication VALUES(5,'Melioraurin','Snafu Pharmaceuticals','N/A');
 
 INSERT INTO 20CS30023.Prescribes VALUES(1,100000001,1,'2022-04-24 10:47',13216584,'5');
-INSERT INTO 20CS30023.Prescribes VALUES(8,100000001,1,'2022-04-27 10:53',86213939,'10');
+INSERT INTO 20CS30023.Prescribes VALUES(8,100000001,2,'2022-04-27 10:53',86213939,'10');
 INSERT INTO 20CS30023.Prescribes VALUES(9,100000002,3,'2022-04-30 16:53',NULL,'5');
-INSERT INTO 20CS30023.Prescribes VALUES(2,100000003,3,'2022-04-27 10:53',86213939,'10');
+INSERT INTO 20CS30023.Prescribes VALUES(2,100000003,2,'2022-04-27 10:53',86213939,'10');
 INSERT INTO 20CS30023.Prescribes VALUES(3,100000004,2,'2022-04-27 10:53',86213939,'10');
 INSERT INTO 20CS30023.Prescribes VALUES(4,100000001,2,'2022-04-27 10:53',86213939,'10');
-
 
 INSERT INTO 20CS30023.Block VALUES(1,1);
 INSERT INTO 20CS30023.Block VALUES(1,2);
@@ -249,12 +249,12 @@ INSERT INTO 20CS30023.Block VALUES(4,3);
 INSERT INTO 20CS30023.Room VALUES(101,'Single',1,1,0);
 INSERT INTO 20CS30023.Room VALUES(102,'Single',1,1,0);
 INSERT INTO 20CS30023.Room VALUES(103,'icu',1,1,0);
-INSERT INTO 20CS30023.Room VALUES(111,'icu',1,2,0);
-INSERT INTO 20CS30023.Room VALUES(112,'Single',1,2,1);
+INSERT INTO 20CS30023.Room VALUES(111,'Single',1,2,0);
+INSERT INTO 20CS30023.Room VALUES(112,'icu',1,2,1);
 INSERT INTO 20CS30023.Room VALUES(113,'Single',1,2,0);
 INSERT INTO 20CS30023.Room VALUES(121,'Single',1,3,0);
 INSERT INTO 20CS30023.Room VALUES(122,'icu',1,3,0);
-INSERT INTO 20CS30023.Room VALUES(123,'icu',1,3,0);
+INSERT INTO 20CS30023.Room VALUES(123,'Single',1,3,0);
 INSERT INTO 20CS30023.Room VALUES(201,'Single',2,1,1);
 INSERT INTO 20CS30023.Room VALUES(202,'icu',2,1,0);
 INSERT INTO 20CS30023.Room VALUES(203,'Single',2,1,0);
@@ -290,17 +290,17 @@ INSERT INTO 20CS30023.On_Call VALUES(103,1,1,'2022-11-04 19:00','2022-11-05 03:0
 INSERT INTO 20CS30023.On_Call VALUES(103,1,2,'2022-11-04 19:00','2022-11-05 03:00');
 INSERT INTO 20CS30023.On_Call VALUES(103,1,3,'2022-11-04 19:00','2022-11-05 03:00');
 
-INSERT INTO 20CS30023.Stay VALUES(3215,100000001,111,'2022-05-01','2022-05-20');
-INSERT INTO 20CS30023.Stay VALUES(3216,100000003,123,'2022-05-03','2022-05-19');
-INSERT INTO 20CS30023.Stay VALUES(3217,100000004,112,'2022-05-02','2022-05-03');
+INSERT INTO 20CS30023.Stay VALUES(3215,100000001,111,'2022-05-01','2022-05-24');
+INSERT INTO 20CS30023.Stay VALUES(3216,100000003,123,'2022-05-03','2022-05-14');
+INSERT INTO 20CS30023.Stay VALUES(3217,100000004,112,'2022-05-02','2022-07-03');
 
 INSERT INTO 20CS30023.Undergoes VALUES(100000001,6,3215,'2022-05-02',3,101);
 INSERT INTO 20CS30023.Undergoes VALUES(100000001,2,3215,'2022-05-03',7,101);
-INSERT INTO 20CS30023.Undergoes VALUES(100000004,1,3217,'2010-05-07',5,102);
+INSERT INTO 20CS30023.Undergoes VALUES(100000004,1,3217,'2022-05-07',3,102);
 INSERT INTO 20CS30023.Undergoes VALUES(100000004,5,3217,'2022-05-09',6,102);
 INSERT INTO 20CS30023.Undergoes VALUES(100000001,3,3217,'2022-05-10',7,101);
-INSERT INTO 20CS30023.Undergoes VALUES(100000004,4,3217,'2009-05-13',3,103);
-INSERT INTO 20CS30023.Undergoes VALUES(100000001,5,3217,'2022-05-09',4,103);
+INSERT INTO 20CS30023.Undergoes VALUES(100000004,4,3217,'2022-05-13',3,103);
+
 /*
 Questions 
     Queries: Obtain the following -
@@ -318,7 +318,7 @@ Questions
 /*
     2. Names of all physicians affiliated with the department name “cardiology” and trained in “bypass surgery”
 */
-       SELECT P.Name
+       SELECT P.Name 
        FROM 20CS30023.Physician AS P
        JOIN 20CS30023.Affiliated_With AS AW
        ON P.EmployeeID = AW.Physician
@@ -332,8 +332,8 @@ Questions
 /*
     3. Names of all the nurses who have ever been on call for room 123
 */
-    SELECT DISTINCT Name FROM 20CS30023.Nurse WHERE EmployeeID IN (
-     SELECT DISTINCT Nurse FROM 20CS30023.On_Call WHERE BlockFloor IN (
+    SELECT Name FROM 20CS30023.Nurse WHERE EmployeeID IN (
+     SELECT Nurse FROM 20CS30023.On_Call WHERE BlockFloor IN (
         SELECT BlockFloor FROM 20CS30023.Room WHERE Number=123
      )
      AND BlockCode IN(
@@ -344,61 +344,61 @@ Questions
     4. Names and addresses of all patients who were prescribed the medication named “remdesivir”
 */   
     SELECT Name, Address FROM 20CS30023.Patient WHERE SSN IN (
-        SELECT DISTINCT Patient FROM 20CS30023.Prescribes WHERE Medication IN (
+        SELECT Patient FROM 20CS30023.Prescribes WHERE Medication IN (
             SELECT Code FROM 20CS30023.Medication WHERE Name='Remdesivir'
         )
     );
 /*   
     5. Name and insurance id of all patients who stayed in the “icu” room type for more than 15 days
 */  
-    SELECT P.Name AS Patient_Name , P.InsuranceID AS Patient_InsuranceID
-    FROM 20CS30023.Patient P
-    JOIN 20CS30023.Stay S
-    ON P.SSN = S.Patient
-    JOIN 20CS30023.Room R
-    ON S.Room = R.Number
-    WHERE TIMESTAMPDIFF(hour, S.Start, S.End) > 360 AND R.Type='icu'; 
+        SELECT P.Name AS Patient_Name , P.InsuranceID AS Patient_InsuranceID
+        FROM 20CS30023.Patient P
+        JOIN 20CS30023.Stay S
+        ON P.SSN = S.Patient
+        JOIN 20CS30023.Room R
+        ON S.Room = R.Number
+        WHERE TIMESTAMPDIFF(hour, S.Start, S.End) > 360 AND R.Type='icu';  
 /*  
     6. Names of all nurses who assisted in the procedure name “bypass surgery”
 */
-    SELECT N.Name AS Nurse_Name
-    FROM 20CS30023.Undergoes U
-    JOIN 20CS30023.Procedure P
-    ON U.Procedure = Code
-    JOIN 20CS30023.Nurse N
-    ON U.AssistingNurse = N.EmployeeID
-    WHERE P.Name = 'bypass surgery';
+          SELECT N.Name AS Nurse_Name
+          FROM 20CS30023.Undergoes U
+          JOIN 20CS30023.Procedure P
+          ON U.Procedure = Code
+          JOIN 20CS30023.Nurse N
+          ON U.AssistingNurse = N.EmployeeID
+          WHERE P.Name = 'bypass surgery';
 /*
     7. Name and position of all nurses who assisted in the procedure name “bypass surgery” along with the names of and the accompanying physicians
 */
-    SELECT P.`Name` AS Physician_Name, N.`Name` AS Nurse_Name, N.`Position` AS Nurse_Position
-    FROM 20CS30023.Undergoes U
-    JOIN 20CS30023.Nurse N
-    ON U.AssistingNurse = N.EmployeeID
-    JOIN 20CS30023.Physician P
-    ON U.Physician = P.EmployeeID
-    JOIN 20CS30023.Procedure Pr
-    ON U.Procedure = Pr.Code
-    WHERE Pr.Name = 'bypass surgery';
-
+    SELECT `Name`,Position FROM 20CS30023.Physician WHERE EmployeeID IN (
+        SELECT Physician FROM 20CS30023.Undergoes WHERE `Procedure` IN (
+            SELECT Code FROM 20CS30023.Procedure WHERE Name='bypass surgery'
+        )
+    );
+    SELECT `Name`,Position FROM 20CS30023.Nurse WHERE EmployeeID IN (
+        SELECT AssistingNurse FROM 20CS30023.Undergoes WHERE `Procedure` IN (
+            SELECT Code FROM 20CS30023.Procedure WHERE Name='bypass surgery'
+        )
+    );
 /*
     8. Obtain the names of all physicians who have performed a medical procedure they have never been trained to perform
 */
-    SELECT DISTINCT P.Name AS Physician_Name
-    FROM 20CS30023.Undergoes U
-    JOIN 20CS30023.Physician P
-    ON U.Physician = P.EmployeeID
-    WHERE P.EmployeeID NOT IN (
-        SELECT DISTINCT EmployeeID 
-        FROM 20CS30023.Physician P1
-        JOIN 20CS30023.Trained_In T
-        WHERE P1.EmployeeID = T.Physician AND U.Procedure = T.Treatment
-    );
+    SELECT Name 
+    FROM 20CS30023.Physician 
+    WHERE EmployeeID NOT IN 
+      (
+        SELECT U.Physician 
+        FROM 20CS30023.Undergoes U 
+        JOIN 20CS30023.Trained_In T 
+        ON T.Physician = U.Physician 
+        WHERE T.Treatment = U.Procedure 
+      );
 /*
     9. Names of all physicians who have performed a medical procedure that they are trained to perform, but such that the procedure was done at a date (Undergoes.Date) after the physician's certification expired (Trained_In.CertificationExpires)
 */
         SELECT Name FROM 20CS30023.Physician WHERE EmployeeID IN (
-            SELECT DISTINCT U.Physician
+            SELECT U.Physician
             FROM 20CS30023.Undergoes U
             JOIN 20CS30023.Trained_In T
             ON T.Physician = U.Physician
@@ -407,7 +407,7 @@ Questions
 /*
     10. Same as the previous query, but include the following information in the results: Physician name, name of procedure, date when the procedure was carried out, name of the patient the procedure was carried out on
 */
-        SELECT DISTINCT P.`Name` AS Physician_Name, Pr.`Name` AS Procedure_Name, U.`Date` AS Procedure_Date, Pa.`Name` AS Patient_Name
+        SELECT P.`Name` AS Physician_Name, Pr.`Name` AS Procedure_Name, U.`Date` AS Procedure_Date, Pa.`Name` AS Patient_Name
             FROM 20CS30023.Undergoes U
             JOIN 20CS30023.Trained_In T 
             ON T.Physician = U.Physician
@@ -430,7 +430,7 @@ Questions
         FROM 20CS30023.Appointment
         GROUP BY Physician, Patient
     )
-    SELECT DISTINCT Pa.Name AS Patient_Name, P.Name AS Physician_Name
+    SELECT Pa.Name AS Patient_Name, P.Name AS Physician_Name
         FROM 20CS30023.Patient Pa
         JOIN 20CS30023.Undergoes U
         ON Pa.SSN = U.Patient
@@ -463,3 +463,4 @@ Questions
             WHERE Medication IS NOT NULL
         )
     );
+
