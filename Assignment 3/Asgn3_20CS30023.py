@@ -205,98 +205,126 @@ cur.execute("INSERT INTO Undergoes VALUES(100000004,5,3217,'2008-05-09',6,102);"
 cur.execute("INSERT INTO Undergoes VALUES(100000001,3,3217,'2008-05-10',7,101);");
 cur.execute("INSERT INTO Undergoes VALUES(100000004,4,3217,'2008-05-13',3,103);");
 
-"""
-Questions 
-    Queries: Obtain the following -
-    1. Names of all physicians who are trained in procedure name “bypass surgery”   
-"""
-print("\n[*] Answer to Query 1:-")
-cur.execute("SELECT P.Name AS Physician_Name FROM Physician AS P JOIN Trained_In AS T ON P.EmployeeID = T.Physician JOIN Procedure AS Pr ON T.Treatment = Pr.Code WHERE Pr.name = 'bypass surgery' ;")
-ans = cur.fetchall()
-printDB(ans, ['Physician_Name'])
+while(1):
+    n = int(input('[?] Enter Query:-:Number (1-13) or Zero to Exit: '))
+    if n==0:
+        print("Exiting...")
+        break
+    elif n==1:
+        """
+        Questions 
+            Queries: Obtain the following -
+            1. Names of all physicians who are trained in procedure name “bypass surgery”   
+        """
+        print("\n[*] Answer to Query 1:-")
+        cur.execute("SELECT P.Name AS Physician_Name FROM Physician AS P JOIN Trained_In AS T ON P.EmployeeID = T.Physician JOIN Procedure AS Pr ON T.Treatment = Pr.Code WHERE Pr.name = 'bypass surgery' ;")
+        ans = cur.fetchall()
+        printDB(ans, ['Physician_Name'])
+    elif n==2:
+        """
+        2. Names of all physicians affiliated with the department name “cardiology” and trained in "bypass surgery"
+        """
+        print("\n[*] Answer to Query 2:-")
+        cur.execute("SELECT P.Name FROM Physician AS P JOIN Affiliated_With AS AW ON P.EmployeeID = AW.Physician JOIN Department AS D ON AW.Department = D.DepartmentID JOIN Trained_In AS T ON P.EmployeeID = T.Physician JOIN Procedure AS Pr ON T.Treatment = Pr.Code WHERE D.Name = 'Cardiology' AND Pr.Name = 'bypass surgery';")
+        ans =  cur.fetchall()
+        printDB(ans, ['Physician_Name'])
+    elif n==3:
+        """
+            3. Names of all the nurses who have ever been on call for room 123
+        """
+        print("\n[*] Answer to Query 3:-")
+        cur.execute("SELECT Name FROM Nurse WHERE EmployeeID IN ( SELECT Nurse FROM On_Call WHERE BlockFloor IN ( SELECT BlockFloor FROM Room WHERE Number=123 ) AND BlockCode IN( SELECT BlockCode FROM Room WHERE Number=123 ));")
+        ans = cur.fetchall()
+        printDB(ans, ['Nurse_Name'])
+    elif n==4:
+        """
+            4. Names and addresses of all patients who were prescribed the medication named “remdesivir”
+        """
+        print("\n[*] Answer to Query 4:-")
+        cur.execute("SELECT Name, Address FROM Patient WHERE SSN IN ( SELECT Patient FROM Prescribes WHERE Medication IN ( SELECT Code FROM Medication WHERE Name='Remdesivir' ));")
+        ans = cur.fetchall()
+        printDB(ans, ['Name_Patient', 'Address_Patient'])
+    elif n==5:
+        """
+            5. Name and insurance id of all patients who stayed in the “icu” room type for more than 15 days
+        """
+        print("\n[*] Answer to Query 5:-")
+        cur.execute("SELECT P.Name AS Patient_Name, P.InsuranceID AS Patient_InsuranceID FROM Patient P JOIN Stay S ON P.SSN = S.Patient JOIN Room R ON S.Room = R.Number WHERE S.EndDate-S.StartDate > 15 AND R.Type='icu';")
+        ans = cur.fetchall()
+        printDB(ans, ['Patient_Name', 'Patient_Insurance_ID'])
+    elif n==6:
+        """
+            6. Names of all nurses who assisted in the procedure name “bypass surgery”
+        """
+        print("\n[*] Answer to Query 6:-")
+        cur.execute("SELECT N.Name AS Nurse_Name FROM Undergoes U JOIN Procedure P ON U.Procedure1 = P.Code JOIN Nurse N ON U.AssistingNurse = N.EmployeeID WHERE P.Name = 'bypass surgery';")
+        ans = cur.fetchall()
+        printDB(ans, ['Nurse_Name'])
+    elif n==7:
+        """
+            7. Name and position of all nurses who assisted in the procedure name “bypass surgery” along with the names of and the accompanying physicians
+        """
+        
+        print("\n[*] Answer to Query 7:-")
+        cur.execute("SELECT P.Name AS Physician_Name, N.Name AS Nurse_Name, N.Position AS Nurse_Position FROM Undergoes U JOIN Physician P ON U.Physician = P.EmployeeID JOIN Nurse N ON U.AssistingNurse = N.EmployeeID JOIN Procedure Pr ON U.Procedure1 = Pr.Code WHERE Pr.Name = 'bypass surgery';")
+        ans = cur.fetchall()
+        printDB(ans, [' Physician_Name', 'Nurse_Name', 'Nurse_Position'])
+    elif n==8:
+        """
+            8. Obtain the names of all physicians who have performed a medical procedure they have never been trained to perform
+        """
 
-"""
-2. Names of all physicians affiliated with the department name “cardiology” and trained in "bypass surgery"
-"""
-print("\n[*] Answer to Query 2:-")
-cur.execute("SELECT P.Name FROM Physician AS P JOIN Affiliated_With AS AW ON P.EmployeeID = AW.Physician JOIN Department AS D ON AW.Department = D.DepartmentID JOIN Trained_In AS T ON P.EmployeeID = T.Physician JOIN Procedure AS Pr ON T.Treatment = Pr.Code WHERE D.Name = 'Cardiology' AND Pr.Name = 'bypass surgery';")
-ans =  cur.fetchall()
-printDB(ans, ['Physician_Name'])
-
-"""
-    3. Names of all the nurses who have ever been on call for room 123
-"""
-print("\n[*] Answer to Query 3:-")
-cur.execute("SELECT Name FROM Nurse WHERE EmployeeID IN ( SELECT Nurse FROM On_Call WHERE BlockFloor IN ( SELECT BlockFloor FROM Room WHERE Number=123 ) AND BlockCode IN( SELECT BlockCode FROM Room WHERE Number=123 ));")
-ans = cur.fetchall()
-printDB(ans, ['Nurse_Name'])
-
-"""
-    4. Names and addresses of all patients who were prescribed the medication named “remdesivir”
-"""
-print("\n[*] Answer to Query 4:-")
-cur.execute("SELECT Name, Address FROM Patient WHERE SSN IN ( SELECT Patient FROM Prescribes WHERE Medication IN ( SELECT Code FROM Medication WHERE Name='Remdesivir' ));")
-ans = cur.fetchall()
-printDB(ans, ['Name_Patient', 'Address_Patient'])
-
-"""
-    5. Name and insurance id of all patients who stayed in the “icu” room type for more than 15 days
-"""
-print("\n[*] Answer to Query 5:-")
-cur.execute("SELECT P.Name AS Patient_Name, P.InsuranceID AS Patient_InsuranceID FROM Patient P JOIN Stay S ON P.SSN = S.Patient JOIN Room R ON S.Room = R.Number WHERE S.EndDate-S.StartDate > 15 AND R.Type='icu';")
-ans = cur.fetchall()
-printDB(ans, ['Patient_Name', 'Patient_Insurance_ID'])
-
-"""
-    6. Names of all nurses who assisted in the procedure name “bypass surgery”
-"""
-print("\n[*] Answer to Query 6:-")
-cur.execute("SELECT N.Name AS Nurse_Name FROM Undergoes U JOIN Procedure P ON U.Procedure1 = P.Code JOIN Nurse N ON U.AssistingNurse = N.EmployeeID WHERE P.Name = 'bypass surgery';")
-ans = cur.fetchall()
-printDB(ans, ['Nurse_Name'])
-
-"""
-    7. Name and position of all nurses who assisted in the procedure name “bypass surgery” along with the names of and the accompanying physicians
-"""
-
-print("\n[*] Answer to Query 7:-")
-cur.execute("SELECT P.Name AS Physician_Name, N.Name AS Nurse_Name, N.Position AS Nurse_Position FROM Undergoes U JOIN Physician P ON U.Physician = P.EmployeeID JOIN Nurse N ON U.AssistingNurse = N.EmployeeID JOIN Procedure Pr ON U.Procedure1 = Pr.Code WHERE Pr.Name = 'bypass surgery';")
-ans = cur.fetchall()
-printDB(ans, [' Physician_Name', 'Nurse_Name', 'Nurse_Position'])
-
-"""
-    8. Obtain the names of all physicians who have performed a medical procedure they have never been trained to perform
-"""
-
-print("\n[*] Answer to Query 8:-")
-cur.execute("SELECT Physician.Name FROM Physician WHERE Physician.EmployeeID NOT IN (SELECT Trained_In.Physician FROM Trained_In WHERE Trained_In.Treatment IN (SELECT Undergoes.Procedure1 FROM Undergoes WHERE Undergoes.Physician = Physician.EmployeeID));")
-ans = cur.fetchall()
-printDB(ans, [' Physician_Name'])
-
-
-"""
-    9. Names of all physicians who have performed a medical procedure that they are trained to perform, but such that the procedure was done at a date (Undergoes.Date) after the physician's certification expired (Trained_In.CertificationExpires)
-"""
-
-"""
-    10. Same as the previous query, but include the following information in the results: Physician name, name of procedure, date when the procedure was carried out, name of the patient the procedure was carried out on
-"""
-
-
-"""
-    11. Names of all patients (also include, for each patient, the name of the patient's physician), such that all the following are true:
-            • The patient has been prescribed some medication by his/her physician
-            • The patient has undergone a procedure with a cost larger that 5000
-            • The patient has had at least two appointment where the physician was affiliated with the cardiology department
-            • The patient's physician is not the head of any department
-"""
-
-"""
-    12. Name and brand of the medication which has been prescribed to the highest number of patients
-"""
-
-
-
+        print("\n[*] Answer to Query 8:-")
+        cur.execute("SELECT DISTINCT Physician.Name FROM Undergoes LEFT JOIN Trained_In ON Undergoes.Physician = Trained_In.Physician AND Undergoes.Procedure1 = Trained_In.Treatment JOIN Physician ON Undergoes.Physician = Physician.EmployeeID WHERE Trained_In.Treatment IS NULL;")
+        ans = cur.fetchall()
+        printDB(ans, [' Physician_Name'])
+    elif n==9:
+        """
+            9. Names of all physicians who have performed a medical procedure that they are trained to perform, but such that the procedure was done at a date (Undergoes.Date) after the physician's certification expired (Trained_In.CertificationExpires)
+        """
+        print("\n[*] Answer to Query 9:-")
+        cur.execute("SELECT Name FROM Physician WHERE EmployeeID IN ( SELECT U.Physician FROM Undergoes U JOIN Trained_In T ON T.Physician = U.Physician WHERE U.Date1 > T.CertificationExpires);")
+        ans = cur.fetchall()
+        printDB(ans, [' Physician_Name'])
+    elif n==10:
+        """
+            10. Same as the previous query, but include the following information in the results: Physician name, name of procedure, date when the procedure was carried out, name of the patient the procedure was carried out on
+        """
+        print("\n[*] Answer to Query 10:-")
+        cur.execute("SELECT P.Name AS Physician_Name, Pr.Name AS Procedure_Name, U.Date1 AS Procedure_Date, Pa.Name AS Patient_Name FROM Undergoes U JOIN Trained_In T ON T.Physician = U.Physician JOIN Patient Pa  ON U.Patient = Pa.SSN JOIN Physician P  ON T.Physician = P.EmployeeID JOIN Procedure Pr ON U.Procedure1 = Pr.Code WHERE U.Date1 > T.CertificationExpires;")
+        ans = cur.fetchall()
+        printDB(ans, [' Physician_Name','Procedure_Name', 'Procedure_Date', 'Patient_Name'])
+    elif n==11:
+        """
+            11. Names of all patients (also include, for each patient, the name of the patient's physician), such that all the following are true:
+                    • The patient has been prescribed some medication by his/her physician
+                    • The patient has undergone a procedure with a cost larger that 5000
+                    • The patient has had at least two appointment where the physician was affiliated with the cardiology department
+                    • The patient's physician is not the head of any department
+        """
+        print("\n[*] Answer to Query 11:-")
+        cur.execute("WITH count_appointments AS (SELECT Physician, Patient, COUNT(*) AS count FROM Appointment GROUP BY Physician, Patient) SELECT Pa.Name AS Patient_Name, P.Name AS Physician_Name FROM Patient Pa JOIN Undergoes U ON Pa.SSN = U.Patient JOIN Department D ON D.Name = 'Cardiology' JOIN Physician P ON P.EmployeeID != D.Head JOIN Affiliated_With AW ON AW.Department = D.DepartmentID JOIN Procedure Pr ON U.Procedure1 = Pr.Code JOIN Prescribes Pre ON P.EmployeeID = Pre.Physician JOIN count_appointments AP ON P.EmployeeID = AP.Physician AND Pa.SSN = AP.Patient WHERE Pr.Cost > 5000 AND P.EmployeeID = AW.Physician AND Pa.SSN = Pre.Patient AND AP.count >= 2;")
+        ans = cur.fetchall()
+        printDB(ans, ['Patient_Name', 'Physician_Name'])
+    elif n==12:
+        """
+            12. Name and brand of the medication which has been prescribed to the highest number of patients
+        """
+        print("\n[*] Answer to Query 12:-")
+        cur.execute("WITH count_prescriptions AS (SELECT Medication, COUNT(*) AS count FROM Prescribes GROUP BY Medication) SELECT Name, Brand FROM Medication WHERE Code IN ( SELECT Medication FROM count_prescriptions WHERE count IN ( SELECT MAX(count) FROM count_prescriptions WHERE Medication IS NOT NULL));")
+        ans = cur.fetchall()
+        printDB(ans, ['Name', 'Brand'])
+    elif n==13:
+        """
+            13. Names of all physicians who are trained in procedure name as custom name
+        """
+        pr_name = input('\n\n[?] Enter the procedure name:- ')
+        print("\n[*] Answer to Query 13:-")
+        cur.execute("SELECT P.Name AS Physician_Name FROM Physician AS P JOIN Trained_In AS T ON P.EmployeeID = T.Physician JOIN Procedure AS Pr ON T.Treatment = Pr.Code WHERE Pr.name = '{}';".format(pr_name))
+        ans = cur.fetchall()
+        printDB(ans, ['Physician_Name'])
+    else:
+        print("INVALID CHOICE!!")
 conn.commit()
 cur.close()
 conn.close()
