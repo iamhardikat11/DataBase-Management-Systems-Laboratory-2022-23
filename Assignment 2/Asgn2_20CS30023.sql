@@ -318,17 +318,17 @@ Questions
 /*
     2. Names of all physicians affiliated with the department name “cardiology” and trained in “bypass surgery”
 */
-       SELECT P.Name 
-       FROM 20CS30023.Physician AS P
-       JOIN 20CS30023.Affiliated_With AS AW
-       ON P.EmployeeID = AW.Physician
-       JOIN 20CS30023.Department AS D
-       ON AW.Department = D.DepartmentID
-       JOIN 20CS30023.Trained_In AS T
-       ON P.EmployeeID = T.Physician
-       JOIN 20CS30023.Procedure AS Pr
-       ON T.Treatment = Pr.Code
-       WHERE D.Name = "cardiology" AND Pr.Name = "bypass surgery";
+    SELECT P.Name 
+    FROM 20CS30023.Physician AS P
+    JOIN 20CS30023.Affiliated_With AS AW
+    ON P.EmployeeID = AW.Physician
+    JOIN 20CS30023.Department AS D
+    ON AW.Department = D.DepartmentID
+    JOIN 20CS30023.Trained_In AS T
+    ON P.EmployeeID = T.Physician
+    JOIN 20CS30023.Procedure AS Pr
+    ON T.Treatment = Pr.Code
+    WHERE D.Name = "cardiology" AND Pr.Name = "bypass surgery";
 /*
     3. Names of all the nurses who have ever been on call for room 123
 */
@@ -351,23 +351,23 @@ Questions
 /*   
     5. Name and insurance id of all patients who stayed in the “icu” room type for more than 15 days
 */  
-        SELECT P.Name AS Patient_Name , P.InsuranceID AS Patient_InsuranceID
-        FROM 20CS30023.Patient P
-        JOIN 20CS30023.Stay S
-        ON P.SSN = S.Patient
-        JOIN 20CS30023.Room R
-        ON S.Room = R.Number
-        WHERE TIMESTAMPDIFF(hour, S.Start, S.End) > 360 AND R.Type='icu';  
+    SELECT P.Name AS Patient_Name , P.InsuranceID AS Patient_InsuranceID
+    FROM 20CS30023.Patient P
+    JOIN 20CS30023.Stay S
+    ON P.SSN = S.Patient
+    JOIN 20CS30023.Room R
+    ON S.Room = R.Number
+    WHERE TIMESTAMPDIFF(hour, S.Start, S.End) > 360 AND R.Type='icu';  
 /*  
     6. Names of all nurses who assisted in the procedure name “bypass surgery”
 */
-          SELECT N.Name AS Nurse_Name
-          FROM 20CS30023.Undergoes U
-          JOIN 20CS30023.Procedure P
-          ON U.Procedure = Code
-          JOIN 20CS30023.Nurse N
-          ON U.AssistingNurse = N.EmployeeID
-          WHERE P.Name = 'bypass surgery';
+    SELECT N.Name AS Nurse_Name
+    FROM 20CS30023.Undergoes U
+    JOIN 20CS30023.Procedure P
+    ON U.Procedure = Code
+    JOIN 20CS30023.Nurse N
+    ON U.AssistingNurse = N.EmployeeID
+    WHERE P.Name = 'bypass surgery';
 /*
     7. Name and position of all nurses who assisted in the procedure name “bypass surgery” along with the names of and the accompanying physicians
 */
@@ -383,40 +383,36 @@ Questions
 /*
     8. Obtain the names of all physicians who have performed a medical procedure they have never been trained to perform
 */
-    SELECT Name 
-    FROM 20CS30023.Physician 
-    WHERE EmployeeID NOT IN 
-      (
-        SELECT U.Physician 
-        FROM 20CS30023.Undergoes U 
-        JOIN 20CS30023.Trained_In T 
-        ON T.Physician = U.Physician 
-        WHERE T.Treatment = U.Procedure 
-      );
+    
+    SELECT 20CS30023.Physician.Name FROM 20CS30023.Physician WHERE 20CS30023.Physician.EmployeeID NOT IN (
+        SELECT 20CS30023.Trained_In.Physician FROM 20CS30023.Trained_In WHERE 20CS30023.Trained_In.Treatment IN (
+            SELECT 20CS30023.Undergoes.`Procedure` FROM 20CS30023.Undergoes WHERE 20CS30023.Undergoes.Physician = 20CS30023.Physician.EmployeeID
+        )
+    );
 /*
     9. Names of all physicians who have performed a medical procedure that they are trained to perform, but such that the procedure was done at a date (Undergoes.Date) after the physician's certification expired (Trained_In.CertificationExpires)
 */
-        SELECT Name FROM 20CS30023.Physician WHERE EmployeeID IN (
-            SELECT U.Physician
-            FROM 20CS30023.Undergoes U
-            JOIN 20CS30023.Trained_In T
-            ON T.Physician = U.Physician
-            WHERE U.Date > T.CertificationExpires
-        );
+    SELECT Name FROM 20CS30023.Physician WHERE EmployeeID IN (
+        SELECT U.Physician
+        FROM 20CS30023.Undergoes U
+        JOIN 20CS30023.Trained_In T
+        ON T.Physician = U.Physician
+        WHERE U.Date > T.CertificationExpires
+    );
 /*
     10. Same as the previous query, but include the following information in the results: Physician name, name of procedure, date when the procedure was carried out, name of the patient the procedure was carried out on
 */
-        SELECT P.`Name` AS Physician_Name, Pr.`Name` AS Procedure_Name, U.`Date` AS Procedure_Date, Pa.`Name` AS Patient_Name
-            FROM 20CS30023.Undergoes U
-            JOIN 20CS30023.Trained_In T 
-            ON T.Physician = U.Physician
-            JOIN 20CS30023.Patient Pa 
-            ON U.Patient = Pa.SSN
-            JOIN 20CS30023.Physician P 
-            ON T.Physician = P.EmployeeID
-            JOIN 20CS30023.Procedure Pr 
-            ON U.Procedure = Pr.Code
-        WHERE U.Date > T.CertificationExpires;
+    SELECT P.`Name` AS Physician_Name, Pr.`Name` AS Procedure_Name, U.`Date` AS Procedure_Date, Pa.`Name` AS Patient_Name
+        FROM 20CS30023.Undergoes U
+        JOIN 20CS30023.Trained_In T 
+        ON T.Physician = U.Physician
+        JOIN 20CS30023.Patient Pa 
+        ON U.Patient = Pa.SSN
+        JOIN 20CS30023.Physician P 
+        ON T.Physician = P.EmployeeID
+        JOIN 20CS30023.Procedure Pr 
+        ON U.Procedure = Pr.Code
+    WHERE U.Date > T.CertificationExpires;
 /*
     11. Names of all patients (also include, for each patient, the name of the patient's physician), such that all the following are true:
             • The patient has been prescribed some medication by his/her physician
@@ -447,9 +443,9 @@ Questions
         ON P.EmployeeID = AP.Physician AND Pa.SSN = AP.Patient
     WHERE Pr.Cost > 5000 AND P.EmployeeID = AW.Physician AND Pa.SSN = Pre.Patient AND AP.count >= 2;
 
-/*
-    12. Name and brand of the medication which has been prescribed to the highest number of patients
-*/
+-- /*
+--     12. Name and brand of the medication which has been prescribed to the highest number of patients
+-- */
     WITH count_prescriptions AS (
         SELECT Medication, COUNT(*) AS count
         FROM 20CS30023.Prescribes
