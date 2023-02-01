@@ -49,6 +49,7 @@ public class Asgn3_20CS30023 {
         // create three connections to three different databases on localhost
         Connection conn1 = null;
         Statement stmt = null;
+        Scanner sc = new Scanner(System.in);
         try 
         {
             conn1 = DriverManager.getConnection("jdbc:postgresql:postgres?user=hardiksoni&password=oblivion");
@@ -235,7 +236,7 @@ public class Asgn3_20CS30023 {
                 stmt.executeUpdate("INSERT INTO Undergoes VALUES(100000004,5,3217,'2008-05-09',6,102);");
                 stmt.executeUpdate("INSERT INTO Undergoes VALUES(100000001,3,3217,'2008-05-10',7,101);");
                 stmt.executeUpdate("INSERT INTO Undergoes VALUES(100000004,4,3217,'2008-05-13',3,103);");
-                Scanner sc = new Scanner(System.in);
+                
                 while(true)
                 {
                     System.out.print("[?] Enter Query:-:Number (1-13) or Zero to Exit: ");
@@ -266,7 +267,9 @@ public class Asgn3_20CS30023 {
                         */
                         System.out.println("\n[*] Answer to Query 2:-");
                         stmt = conn1.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-                        ResultSet rs = stmt.executeQuery("SELECT P.Name FROM Physician AS P JOIN Affiliated_With AS AW ON P.EmployeeID = AW.Physician JOIN Department AS D ON AW.Department = D.DepartmentID JOIN Trained_In AS T ON P.EmployeeID = T.Physician JOIN Procedure AS Pr ON T.Treatment = Pr.Code WHERE D.Name = 'Cardiology' AND Pr.Name = 'bypass surgery';");
+                        ResultSet rs = stmt.executeQuery("SELECT P.Name AS Physician_Name FROM Physician AS P JOIN Affiliated_With AS AW ON P.EmployeeID = AW.Physician JOIN Department AS D ON AW.Department = D.DepartmentID JOIN Trained_In AS T ON P.EmployeeID = T.Physician JOIN Procedure AS Pr ON T.Treatment = Pr.Code WHERE D.Name = 'Cardiology' AND Pr.Name = 'bypass surgery';");
+                        String[] columns = {"Physician_Name"};
+                        printDB(rs, columns);
                         rs.close();
                     }
                     else if(n==3)
@@ -276,7 +279,9 @@ public class Asgn3_20CS30023 {
                         */
                         System.out.println("\n[*] Answer to Query 3:-");
                         stmt = conn1.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-                        ResultSet rs = stmt.executeQuery("SELECT Name FROM Nurse WHERE EmployeeID IN ( SELECT Nurse FROM On_Call WHERE BlockFloor IN ( SELECT BlockFloor FROM Room WHERE Number=123 ) AND BlockCode IN( SELECT BlockCode FROM Room WHERE Number=123 ));");
+                        ResultSet rs = stmt.executeQuery("SELECT Name AS Nurse_Name FROM Nurse WHERE EmployeeID IN ( SELECT Nurse FROM On_Call WHERE BlockFloor IN ( SELECT BlockFloor FROM Room WHERE Number=123 ) AND BlockCode IN( SELECT BlockCode FROM Room WHERE Number=123 ));");
+                        String[] columns = {"Nurse_Name"};
+                        printDB(rs, columns);
                         rs.close();
                     }
                     else if(n==4)
@@ -286,7 +291,9 @@ public class Asgn3_20CS30023 {
                          */
                         System.out.println("\n[*] Answer to Query 4:-");
                         stmt = conn1.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-                        ResultSet rs = stmt.executeQuery("SELECT Name, Address FROM Patient WHERE SSN IN ( SELECT Patient FROM Prescribes WHERE Medication IN ( SELECT Code FROM Medication WHERE Name='Remdesivir' ));");
+                        ResultSet rs = stmt.executeQuery("SELECT Name AS Patient_Name, Address AS Patient_Address FROM Patient WHERE SSN IN ( SELECT Patient FROM Prescribes WHERE Medication IN ( SELECT Code FROM Medication WHERE Name='Remdesivir' ));");
+                        String[] columns = {"Patient_Name", "Patient_Address"};
+                        printDB(rs, columns);
                         rs.close();
                     }
                     else if(n==5)
@@ -297,6 +304,8 @@ public class Asgn3_20CS30023 {
                         System.out.println("\n[*] Answer to Query 5:-");
                         stmt = conn1.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
                         ResultSet rs = stmt.executeQuery("SELECT P.Name AS Patient_Name, P.InsuranceID AS Patient_InsuranceID FROM Patient P JOIN Stay S ON P.SSN = S.Patient JOIN Room R ON S.Room = R.Number WHERE S.EndDate-S.StartDate > 15 AND R.Type='icu';");
+                        String[] columns = {"Patient_Name", "Patient_InsuranceID"};
+                        printDB(rs, columns);
                         rs.close();
                     }
                     else if(n==6)
@@ -307,6 +316,8 @@ public class Asgn3_20CS30023 {
                         System.out.println("\n[*] Answer to Query 6:-");
                         stmt = conn1.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
                         ResultSet rs = stmt.executeQuery("SELECT N.Name AS Nurse_Name FROM Undergoes U JOIN Procedure P ON U.Procedure1 = P.Code JOIN Nurse N ON U.AssistingNurse = N.EmployeeID WHERE P.Name = 'bypass surgery';");
+                        String[] columns = {"Nurse_Name"};
+                        printDB(rs, columns);
                         rs.close();
                     }
                     else if(n==7)
@@ -317,6 +328,8 @@ public class Asgn3_20CS30023 {
                         System.out.println("\n[*] Answer to Query 7:-");
                         stmt = conn1.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
                         ResultSet rs = stmt.executeQuery("SELECT P.Name AS Physician_Name, N.Name AS Nurse_Name, N.Position AS Nurse_Position FROM Undergoes U JOIN Physician P ON U.Physician = P.EmployeeID JOIN Nurse N ON U.AssistingNurse = N.EmployeeID JOIN Procedure Pr ON U.Procedure1 = Pr.Code WHERE Pr.Name = 'bypass surgery';");
+                        String[] columns = {"Physician_Name", "Nurse_Name", "Nurse_Position"};
+                        printDB(rs, columns);
                         rs.close();
                     }
                     else if(n==8)
@@ -326,7 +339,9 @@ public class Asgn3_20CS30023 {
                          */
                         System.out.println("\n[*] Answer to Query 8:-");
                         stmt = conn1.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-                        ResultSet rs = stmt.executeQuery("SELECT DISTINCT Physician.Name FROM Undergoes LEFT JOIN Trained_In ON Undergoes.Physician = Trained_In.Physician AND Undergoes.Procedure1 = Trained_In.Treatment JOIN Physician ON Undergoes.Physician = Physician.EmployeeID WHERE Trained_In.Treatment IS NULL;");
+                        ResultSet rs = stmt.executeQuery("SELECT DISTINCT Physician.Name AS Physician_Name FROM Undergoes LEFT JOIN Trained_In ON Undergoes.Physician = Trained_In.Physician AND Undergoes.Procedure1 = Trained_In.Treatment JOIN Physician ON Undergoes.Physician = Physician.EmployeeID WHERE Trained_In.Treatment IS NULL;");
+                        String[] columns = {"Physician_Name"};
+                        printDB(rs, columns);
                         rs.close();
                     }
                     else if(n==9)
@@ -336,7 +351,9 @@ public class Asgn3_20CS30023 {
                          */
                         System.out.println("\n[*] Answer to Query 9:-");
                         stmt = conn1.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-                        ResultSet rs = stmt.executeQuery("SELECT Name FROM Physician WHERE EmployeeID IN ( SELECT U.Physician FROM Undergoes U JOIN Trained_In T ON T.Physician = U.Physician WHERE U.Date1 > T.CertificationExpires);");
+                        ResultSet rs = stmt.executeQuery("SELECT Name AS Physician_Name FROM Physician WHERE EmployeeID IN ( SELECT U.Physician FROM Undergoes U JOIN Trained_In T ON T.Physician = U.Physician WHERE U.Date1 > T.CertificationExpires);");
+                        String[] columns = {"Physician_Name"};
+                        printDB(rs, columns);
                         rs.close();
                     }
                     else if(n==10)
@@ -347,6 +364,8 @@ public class Asgn3_20CS30023 {
                         System.out.println("\n[*] Answer to Query 10:-");
                         stmt = conn1.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
                         ResultSet rs = stmt.executeQuery("SELECT P.Name AS Physician_Name, Pr.Name AS Procedure_Name, U.Date1 AS Procedure_Date, Pa.Name AS Patient_Name FROM Undergoes U JOIN Trained_In T ON T.Physician = U.Physician JOIN Patient Pa  ON U.Patient = Pa.SSN JOIN Physician P  ON T.Physician = P.EmployeeID JOIN Procedure Pr ON U.Procedure1 = Pr.Code WHERE U.Date1 > T.CertificationExpires;");
+                        String[] columns = {"Physician_Name", "Procedure_name", "Procedure_Date","Patient_name"};
+                        printDB(rs, columns);
                         rs.close();
                     }
                     else if(n==11)
@@ -361,6 +380,8 @@ public class Asgn3_20CS30023 {
                         System.out.println("\n[*] Answer to Query 11:-");
                         stmt = conn1.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
                         ResultSet rs = stmt.executeQuery("WITH count_appointments AS (SELECT Physician, Patient, COUNT(*) AS count FROM Appointment GROUP BY Physician, Patient) SELECT Pa.Name AS Patient_Name, P.Name AS Physician_Name FROM Patient Pa JOIN Undergoes U ON Pa.SSN = U.Patient JOIN Department D ON D.Name = 'Cardiology' JOIN Physician P ON P.EmployeeID != D.Head JOIN Affiliated_With AW ON AW.Department = D.DepartmentID JOIN Procedure Pr ON U.Procedure1 = Pr.Code JOIN Prescribes Pre ON P.EmployeeID = Pre.Physician JOIN count_appointments AP ON P.EmployeeID = AP.Physician AND Pa.SSN = AP.Patient WHERE Pr.Cost > 5000 AND P.EmployeeID = AW.Physician AND Pa.SSN = Pre.Patient AND AP.count >= 2;");
+                        String[] columns = {"Patient_Name","Physician_Name"};
+                        printDB(rs, columns);
                         rs.close();
                     }   
                     else if(n==12)
@@ -370,7 +391,9 @@ public class Asgn3_20CS30023 {
                          */
                         System.out.println("\n[*] Answer to Query 12:-");
                         stmt = conn1.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-                        ResultSet rs = stmt.executeQuery("WITH count_prescriptions AS (SELECT Medication, COUNT(*) AS count FROM Prescribes GROUP BY Medication) SELECT Name, Brand FROM Medication WHERE Code IN ( SELECT Medication FROM count_prescriptions WHERE count IN ( SELECT MAX(count) FROM count_prescriptions WHERE Medication IS NOT NULL));");
+                        ResultSet rs = stmt.executeQuery("WITH count_prescriptions AS (SELECT Medication, COUNT(*) AS count FROM Prescribes GROUP BY Medication) SELECT Name AS Medicine_Name, Brand AS Brand_Name FROM Medication WHERE Code IN ( SELECT Medication FROM count_prescriptions WHERE count IN ( SELECT MAX(count) FROM count_prescriptions WHERE Medication IS NOT NULL));");
+                        String[] columns = {"Medicine_Name","Brand_Name"};
+                        printDB(rs, columns);
                         rs.close();
                     }
                     else if(n==13)
@@ -380,9 +403,12 @@ public class Asgn3_20CS30023 {
                          */
                         System.out.print("Enter the Procedure Name:- ");
                         String pr_name = sc.nextLine();
+                        pr_name = sc.nextLine();
                         System.out.println("\n[*] Answer to Query 13:-");
                         stmt = conn1.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
                         ResultSet rs = stmt.executeQuery("SELECT P.Name AS Physician_Name FROM Physician AS P JOIN Trained_In AS T ON P.EmployeeID = T.Physician JOIN Procedure AS Pr ON T.Treatment = Pr.Code WHERE Pr.name = '"+pr_name+"';");
+                        String[] columns = {"Physician_Name"};
+                        printDB(rs, columns);
                         rs.close();
                     }
                     else
@@ -391,7 +417,7 @@ public class Asgn3_20CS30023 {
                     }
                 }
                 stmt.close();
-                sc.close();
+                
             }
         } 
         catch (SQLException ex) 
@@ -412,5 +438,6 @@ public class Asgn3_20CS30023 {
                 ex.printStackTrace();
             }
         }
+        sc.close();
     }
 }
