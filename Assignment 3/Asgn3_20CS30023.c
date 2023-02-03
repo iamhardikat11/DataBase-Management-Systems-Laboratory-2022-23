@@ -1,158 +1,51 @@
-/* gcc -c example_odbc.c
-   gcc -o example_odbc example_odbc.o -lodbc
-*/
-
 #include <stdio.h>
-#include <string.h>
 #include <sql.h>
 #include <sqlext.h>
 
-SQLHENV  henv=NULL;
-SQLHDBC  hdbc=NULL;
-
-int ODBCConnectDB(SQLCHAR* ds, SQLCHAR* user, SQLCHAR* pw)
+int main(void)
 {
-  SQLRETURN  rc;
+   SQLHENV env;
+   SQLHDBC dbc;
+   SQLRETURN ret;
 
-  hdbc=NULL;
-  henv=NULL;
+   /* Allocate an environment handle */
+   ret = SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &env);
+   if (!SQL_SUCCEEDED(ret))
+   {
+      printf("Error allocating environment handle\n");
+      return 1;
+   }
 
-  // Allocate environment handle
-  rc=SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &henv);  
-  if (rc==SQL_SUCCESS || rc==SQL_SUCCESS_WITH_INFO) 
-  {
-    //  Set the ODBC version environment attribute
-    rc=SQLSetEnvAttr(henv, SQL_ATTR_ODBC_VERSION, (void*)SQL_OV_ODBC3, 0); 
+   /* Set the ODBC version environment attribute */
+   ret = SQLSetEnvAttr(env, SQL_ATTR_ODBC_VERSION, (void *) SQL_OV_ODBC3, 0);
+   if (!SQL_SUCCEEDED(ret))
+   {
+      printf("Error setting ODBC version\n");
+      return 1;
+   }
 
-    if (rc==SQL_SUCCESS || rc==SQL_SUCCESS_WITH_INFO) 
-    {
-      // Allocate connection handle 
-      rc=SQLAllocHandle(SQL_HANDLE_DBC, henv, &hdbc); 
+   /* Allocate a connection handle */
+   ret = SQLAllocHandle(SQL_HANDLE_DBC, env, &dbc);
+   if (!SQL_SUCCEEDED(ret))
+   {
+      printf("Error allocating connection handle\n");
+      return 1;
+   }
 
-      if (rc==SQL_SUCCESS || rc==SQL_SUCCESS_WITH_INFO) 
-      {
-        // Set login timeout to 5 seconds. 
-        SQLSetConnectAttr(hdbc, SQL_LOGIN_TIMEOUT, (SQLPOINTER)5, 0);
+   /* Connect to the database */
+   ret = SQLConnect(dbc, (SQLCHAR *) "postgresql", SQL_NTS, (SQLCHAR *) "postgres", SQL_NTS, (SQLCHAR *) "1234", SQL_NTS);
+   if (!SQL_SUCCEEDED(ret))
+   {
+      printf("Error connecting to the database\n");
+      return 1;
+   }
 
-        // Connect to data source
-        rc=SQLConnect(hdbc, ds, SQL_NTS, user, SQL_NTS, pw, SQL_NTS);
-	
-        if (rc==SQL_SUCCESS || rc==SQL_SUCCESS_WITH_INFO)
-        {
-          printf("%s\n", "connected");
-          return 1;
-        }
-        SQLDisconnect(hdbc);
-      }
-      SQLFreeHandle(SQL_HANDLE_DBC, hdbc);
-    }
-  }
-  SQLFreeHandle(SQL_HANDLE_ENV, henv);
+   printf("Successfully connected to the database\n");
 
-  hdbc=NULL;
-  henv=NULL;
+   /* Disconnect and free up resources */
+   SQLDisconnect(dbc);
+   SQLFreeHandle(SQL_HANDLE_DBC, dbc);
+   SQLFreeHandle(SQL_HANDLE_ENV, env);
 
-  printf("%s\n", "not connected");
-  return 0;
-}
-
-int ODBCDisconnectDB()
-{
-  if(hdbc) 
-  {
-    SQLDisconnect(hdbc);	
-    SQLFreeHandle(SQL_HANDLE_DBC, hdbc);
-  }
-  if(henv) SQLFreeHandle(SQL_HANDLE_ENV, henv);
-  hdbc=NULL;
-  henv=NULL;
-  return 1;
-}
-
-int db_exec_stmt(char* stmt_str)
-{
-  SQLHSTMT hstmt;
-  SQLRETURN  rc;
-
-  if(henv==NULL || hdbc==NULL) return 0;
-
-  /* Allocate statement handle */
-  rc = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt); 
-  if(!(rc==SQL_SUCCESS || rc==SQL_SUCCESS_WITH_INFO) ) return 0;
-	
-  rc = SQLExecDirect(hstmt, stmt_str, SQL_NTS);
-  SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
-  if(rc==SQL_SUCCESS || rc==SQL_SUCCESS_WITH_INFO) return 1;
-  if(rc==SQL_NO_DATA) return 1;
-
-  printf("sqlerr: %d\n", rc);
-  return 0;
-}
-
-
-
-int db_fetch()
-{
-  SQLRETURN r;
-  SQLHSTMT hstmt;
-  SQLCHAR sql[256];
-  SQLLEN n;
-  SQLINTEGER id;
-  SQLCHAR name[20];
-  SQLREAL age;
-  SQL_DATE_STRUCT birthday;
-  SQL_TIMESTAMP_STRUCT create_timestamp;
-
-  r=SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt);
-
-  if(!(r==SQL_SUCCESS||r==SQL_SUCCESS_WITH_INFO))
-  {
-    return 0;
-  }
-
-  strcpy(sql, "select id, name, age, birthday, create_timestamp from employee order by name");
-  r=SQLExecDirect(hstmt, sql, SQL_NTS);
-
-  if(r!=SQL_SUCCESS) 
-  {
-    printf("cannot access [%s]\n", sql);
-    SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
-    return 0;
-  }
-
-  while(1)
-  {
-    r=SQLFetch(hstmt);
-    if(r==SQL_SUCCESS||r==SQL_SUCCESS_WITH_INFO)
-    {
-      r=SQLGetData(hstmt, 1, SQL_C_ULONG, &id, 0, &n);
-      r=SQLGetData(hstmt, 2, SQL_C_CHAR, name, 20, &n);
-      r=SQLGetData(hstmt, 3, SQL_C_FLOAT, &age, 0, &n);
-      r=SQLGetData(hstmt, 4,  SQL_C_TYPE_DATE, &birthday, 0, &n);
-      r=SQLGetData(hstmt, 5,  SQL_C_TYPE_TIMESTAMP, &create_timestamp, 0, &n);
-      printf("%d, %s, %.1f, %d-%d-%d, \n", id, name, age, birthday.year, birthday.month, birthday.day);
-    }
-    else if(SQL_NO_DATA==r)
-    {
-      break;
-    }
-    else
-    {
-      printf("%s\n", "fail to load fleet_veh data");
-      SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
-      return 0;
-    }
-  }
-  SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
-
-  return 1;
-}
-
-void main()
-{
-  ODBCConnectDB("odbcpgw", "postgres", "123456");
-  db_exec_stmt("insert into employee (name, age, birthday,create_timestamp) \
-    values (\'joy\',20.0,\'2001-1-2\',now())");
-  db_fetch();
-  ODBCDisconnectDB();
+   return 0;
 }
