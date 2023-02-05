@@ -1,5 +1,9 @@
-package net.codejava.jdbc;
-
+// package net.codejava.jdbc;
+/*
+ * Steps to Run Code :-
+ * 1. Download the .jar file
+ * 2. java -cp *.jar Asgn3_20CS30023.java
+ */
 import java.sql.*;
 import java.util.*;
 import java.sql.Connection;
