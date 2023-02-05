@@ -10,7 +10,6 @@ import java.sql.Connection;
 import java.sql.Statement;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.Properties;
 
 public class Asgn3_20CS30023 {
     public static void printDB(ResultSet data, String[] columns) throws SQLException {
